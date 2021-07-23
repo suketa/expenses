@@ -10,7 +10,11 @@ Resources:
       CodeUri: dbstream/
       Handler: expenses.handler
       Runtime: ruby2.7
-      Policies: AWSLambdaDynamoDBExecutionRole
+      Policies:
+        - AWSLambdaDynamoDBExecutionRole
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExpensesTable
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
