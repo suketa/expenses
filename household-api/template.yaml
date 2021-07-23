@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  household-api
+
+  Sample SAM Template for household-api
+
+Resources:
+  CreateHouseholdFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: household/
+      Handler: creator.lambda_handler
+      Runtime: ruby2.7
+      MemorySize: 128
+      Timeout: 100
+      Description: household item creation
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref HouseHoldTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          HOUSE_HOLD_TABLE: !Ref HouseHoldTable
+      Events:
+        HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /household
+            Method: post
+
+  # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
+  HouseHoldTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: dkey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: dkey
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  CreateHouseholdApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/household/"
+  CreateHouseholdFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt CreateHouseholdFunction.Arn
+  CreateHouseholdFunctionIamRole:
+    Description: "Implicit IAM Role created for CreateHouseholdFunction function"
+    Value: !GetAtt CreateHouseholdFunctionRole.Arn
