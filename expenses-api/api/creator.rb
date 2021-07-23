@@ -25,7 +25,13 @@ class ExpensesCreator
   end
 
   def dkey(record)
-    Time.now.strftime('%Y%m%dT%H%M%S.%L') + '#' + record['key']
+    prefix = suffix = ''
+    if record['income']
+      prefix = 'income_'
+    else
+      suffix = "##{record['key']}"
+    end
+    "#{prefix}#{Time.now.strftime('%Y%m%dT%H%M%S.%L')}#{suffix}"
   end
 
   def update_item_param(key, cost)
