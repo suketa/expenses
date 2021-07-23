@@ -1,39 +1,70 @@
-# require 'httparty'
 require 'json'
+require 'aws-sdk-dynamodb'
 
+class ExpensesCreator
+  VERSION = '0.0.1'.freeze
+
+  def initialize(event, _context)
+    @event = event
+  end
+
+  def run
+    record = record(@event)
+    param = update_item_param(dkey(record), record['cost'])
+    dynamodb.update_item(param)
+    response(200, 'success')
+  rescue StandardError => e
+    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}"
+    response(400, "failed to insert record, #{e.message}")
+  end
+
+  private
+
+  def record(event)
+    JSON.parse(event['body'])
+  end
+
+  def dkey(record)
+    Time.now.strftime('%Y%m%dT%H%M%S.%L') + '#' + record['key']
+  end
+
+  def update_item_param(key, cost)
+    {
+      table_name: ENV['EXPENSES_TABLE'],
+      key: {
+        dkey: key
+      },
+      expression_attribute_values: {
+        ':cost' => cost,
+        ':initial_cost' => 0
+      },
+      update_expression: 'SET cost = if_not_exists(cost, :initial_cost) + :cost'
+    }
+  end
+
+  def response(code, message)
+    {
+      statusCode: code,
+      body: {
+        message: message
+      }.to_json
+    }
+  end
+
+  def dynamodb
+    @dynamodb ||= Aws::DynamoDB::Client.new
+  end
+end
+
+#
+# Expected JSON Body
+#
+# {
+#   key: "book",
+#   cost: 2000
+# }
+#
 def lambda_handler(event:, context:)
-  # Sample pure Lambda function
-
-  # Parameters
-  # ----------
-  # event: Hash, required
-  #     API Gateway Lambda Proxy Input Format
-  #     Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
-
-  # context: object, required
-  #     Lambda Context runtime methods and attributes
-  #     Context doc: https://docs.aws.amazon.com/lambda/latest/dg/ruby-context.html
-
-  # Returns
-  # ------
-  # API Gateway Lambda Proxy Output Format: dict
-  #     'statusCode' and 'body' are required
-  #     # api-gateway-simple-proxy-for-lambda-output-format
-  #     Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
-
-  # begin
-  #   response = HTTParty.get('http://checkip.amazonaws.com/')
-  # rescue HTTParty::Error => error
-  #   puts error.inspect
-  #   raise error
-  # end
-  p ENV;
-
-  {
-    statusCode: 200,
-    body: {
-      message: "Hello World!",
-      # location: response.body
-    }.to_json
-  }
+  creator = ExpensesCreator.new(event, context)
+  creator.run
 end
