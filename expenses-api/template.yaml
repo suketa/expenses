@@ -1,37 +1,53 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  household-api
-
-  Sample SAM Template for household-api
+  expenses-api
 
 Resources:
-  CreateHouseholdFunction:
+  ExpensesDBStream:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dbstream/
+      Handler: expenses.handler
+      Runtime: ruby2.7
+      Policies: AWSLambdaDynamoDBExecutionRole
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          EXPENSES_TABLE: !Ref ExpensesTable
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt ExpensesTable.StreamArn
+            BatchSize: 100
+            StartingPosition: TRIM_HORIZON
+  CreateExpensesFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: household/
+      CodeUri: api/
       Handler: creator.lambda_handler
       Runtime: ruby2.7
       MemorySize: 128
       Timeout: 100
-      Description: household item creation
+      Description: expenses item creation
       Policies:
         # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref HouseHoldTable
+            TableName: !Ref ExpensesTable
       Environment:
         Variables:
           # Make table name accessible as environment variable from function code during execution
-          HOUSE_HOLD_TABLE: !Ref HouseHoldTable
+          EXPENSES_TABLE: !Ref ExpensesTable
       Events:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /household
+            Path: /expenses
             Method: post
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
-  HouseHoldTable:
+  ExpensesTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -50,12 +66,12 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  CreateHouseholdApi:
+  CreateExpensesApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/household/"
-  CreateHouseholdFunction:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/expenses/"
+  CreateExpensesFunction:
     Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt CreateHouseholdFunction.Arn
-  CreateHouseholdFunctionIamRole:
-    Description: "Implicit IAM Role created for CreateHouseholdFunction function"
-    Value: !GetAtt CreateHouseholdFunctionRole.Arn
+    Value: !GetAtt CreateExpensesFunction.Arn
+  CreateExpensesFunctionIamRole:
+    Description: "Implicit IAM Role created for CreateExpensesFunction function"
+    Value: !GetAtt CreateExpensesFunctionRole.Arn
