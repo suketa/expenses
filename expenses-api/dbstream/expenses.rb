@@ -34,26 +34,26 @@ class ExpensesTrigger
   end
 
   def income?(record)
-    hkey(record)&.start_with?('income')
+    dkey(record)&.start_with?('income')
   end
 
   def transaction?(record)
-    dkey = hkey(record)
+    dkey = dkey(record)
     dkey&.start_with?(/^\d/) || dkey&.start_with?('income')
   end
 
   def sub_summary_key(record)
-    dkey = hkey(record)
+    dkey = dkey(record)
     income?(record) ? 'ignore' : "group_month_item_#{dkey.gsub(/\d{2}T\d{6}\.\d{3}/, '')}"
   end
 
   def summary_key_month(record)
-    dkey = hkey(record)
+    dkey = dkey(record)
     income?(record) ? 'ignore' : "group_month_#{dkey[0, 6]}"
   end
 
   def summary_key_year(record)
-    dkey = hkey(record)
+    dkey = dkey(record)
     income?(record) ? "group_income_year_#{dkey[7, 4]}" : "group_year_#{dkey[0, 4]}"
   end
 
@@ -70,15 +70,30 @@ class ExpensesTrigger
   end
 
   def update_total_cost(key, total_cost)
-    param = update_item_param(key, total_cost)
+    key1, key2 = split_key(key)
+    param = update_item_param(key1, key2, total_cost)
     dynamodb.update_item(param)
   end
 
-  def update_item_param(key, total_cost)
+  def split_key(key)
+    case key
+    when /\Agroup_month_item_(\d{6})/
+      [Regexp.last_match(1), key]
+    when /\Agroup_income_year_(\d{3})\d{1}/
+      ["#{Regexp.last_match(1)}0I", key]
+    when /\Agroup_year_(\d{3})\d{1}/
+      ["#{Regexp.last_match(1)}0C", key]
+    when /\Agroup_month_(\d{4})/
+      [Regexp.last_match(1), key]
+    end
+  end
+
+  def update_item_param(uid, dkey, total_cost)
     {
       table_name: ENV['EXPENSES_TABLE'],
       key: {
-        dkey: key
+        uid: uid,
+        dkey: dkey
       },
       expression_attribute_values: {
         ':total_cost' => total_cost,
@@ -92,7 +107,7 @@ class ExpensesTrigger
     @dynamodb ||= Aws::DynamoDB::Client.new
   end
 
-  def hkey(record)
+  def dkey(record)
     record.dig('Keys', 'dkey', 'S')
   end
 end
