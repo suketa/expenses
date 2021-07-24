@@ -10,7 +10,9 @@ class ExpensesCreator
 
   def run
     record = record(@event)
-    param = update_item_param(dkey(record), record['cost'])
+    dkey = dkey(record)
+    uid = uid(dkey)
+    param = update_item_param(uid, dkey, record['cost'])
     dynamodb.update_item(param)
     response(200, 'success')
   rescue StandardError => e
@@ -34,11 +36,18 @@ class ExpensesCreator
     "#{prefix}#{Time.now.strftime('%Y%m%dT%H%M%S.%L')}#{suffix}"
   end
 
-  def update_item_param(key, cost)
+  def uid(dkey)
+    if /\A[^\d]*(\d{8})T/ =~ dkey
+      Regexp.last_match(1)
+    end
+  end
+
+  def update_item_param(uid, dkey, cost)
     {
       table_name: ENV['EXPENSES_TABLE'],
       key: {
-        dkey: key
+        uid: uid,
+        dkey: dkey
       },
       expression_attribute_values: {
         ':cost' => cost,
@@ -67,7 +76,8 @@ end
 #
 # {
 #   key: "book",
-#   cost: 2000
+#   cost: 2000,
+#   income: false
 # }
 #
 def lambda_handler(event:, context:)
