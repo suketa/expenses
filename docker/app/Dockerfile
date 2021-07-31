@@ -53,5 +53,6 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.21.zip" -o "a
     rm awscliv2.zip && rm -rf ./aws
 
 RUN pip install aws-sam-cli==1.27.1
+RUN npm install -g @aws-amplify/cli@5.2.1
 
 WORKDIR /app
