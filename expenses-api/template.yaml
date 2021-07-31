@@ -4,6 +4,47 @@ Description: >
   expenses-api
 
 Resources:
+  ExpensesUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+
+  ExpensesUserPoolTokenClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref ExpensesUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+      - USER_PASSWORD_AUTH
+
+  # ExpensesUserPoolUser:
+  #   Type: AWS::Cognito::UserPoolUser
+  #   Properties:
+  #     Username: !Ref EXPENSES_USER
+  #     UserPoolId: !Ref ExpensesUserPool
+
+  ExpensesApi:
+    DependsOn: ExpensesUserPool
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt "ExpensesUserPool.Arn"
+
   ExpensesDBStream:
     Type: AWS::Serverless::Function
     Properties:
@@ -26,6 +67,7 @@ Resources:
             Stream: !GetAtt ExpensesTable.StreamArn
             BatchSize: 100
             StartingPosition: TRIM_HORIZON
+
   CreateExpensesFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -44,11 +86,14 @@ Resources:
           # Make table name accessible as environment variable from function code during execution
           EXPENSES_TABLE: !Ref ExpensesTable
       Events:
-        HelloWorld:
+        Post:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /expenses
+            RestApiId: !Ref ExpensesApi
             Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ExpensesTable:
@@ -75,10 +120,10 @@ Outputs:
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   CreateExpensesApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/expenses/"
+    Description: "API Gateway endpoint URL for Prod stage for Expenses function"
+    Value: !Sub "https://${ExpensesApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/expenses/"
   CreateExpensesFunction:
-    Description: "Hello World Lambda Function ARN"
+    Description: "Expenses Lambda Function ARN"
     Value: !GetAtt CreateExpensesFunction.Arn
   CreateExpensesFunctionIamRole:
     Description: "Implicit IAM Role created for CreateExpensesFunction function"
