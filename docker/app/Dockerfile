@@ -25,6 +25,7 @@ RUN apt-get update && \
             git \
             tzdata \
             unzip \
+            less \
             zlib1g-dev \
             dpkg-dev \
             wget \
