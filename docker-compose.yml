@@ -6,9 +6,13 @@ services:
       context: .
       dockerfile: ./docker/app/Dockerfile
     volumes:
-      - .:/app
+      - .:/app:cached
       - bundle:/usr/local/bundle
+      - dot_amplify:/root/.amplify
+      - dot_aws:/root/.aws
+
     tty: true
 volumes:
   bundle:
-    driver: local
+  dot_amplify:
+  dot_aws:
