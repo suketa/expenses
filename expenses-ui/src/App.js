@@ -1,26 +1,31 @@
-import logo from './logo.svg';
 import './App.css';
-import { withAuthenticator } from '@aws-amplify/ui-react';
+import { AmplifyAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { useState, useEffect } from 'react';
+import { UserContext } from './context'
+import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
+import New from './form/New';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+  const [authState, setAuthState] = useState();
+  const [user, setUser] = useState();
 
-export default withAuthenticator(App);
+  useEffect(() =>   {
+    return onAuthUIStateChange((nextAuthState, authData) => {
+      setAuthState(nextAuthState);
+      setUser(authData);
+    });
+  }, []);
+
+  return authState === AuthState.SignedIn && user ? (
+      <div className="App">
+        <header className="App-header">
+          <UserContext.Provider value={user}>
+            <New />
+          </UserContext.Provider>
+          <AmplifySignOut />
+        </header>
+      </div>
+  ) : ( <AmplifyAuthenticator /> );
+};
+
+export default App;
