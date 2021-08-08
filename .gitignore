@@ -278,4 +278,5 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 team-provider-info.json
+const.js
 #amplify-do-not-edit-end

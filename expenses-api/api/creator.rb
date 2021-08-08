@@ -60,6 +60,9 @@ class ExpensesCreator
   def response(code, message)
     {
       statusCode: code,
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
       body: {
         message: message
       }.to_json
