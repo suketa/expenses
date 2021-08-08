@@ -6,6 +6,7 @@ import axios from 'axios';
 const New = () => {
   const [ item, setItem ] = useState('');
   const [ cost, setCost ] = useState(0);
+  const [ income, setIncome ] = useState(false);
 
   const user = useContext(UserContext);
   // console.log(user);
@@ -19,8 +20,9 @@ const New = () => {
     const data = {
       cost: cost,
       key: item,
-      income: false
+      income: income
     };
+    console.log(data);
     axios.post(url, data, config)
       .then(response => {
         console.log(response.data)
@@ -29,7 +31,7 @@ const New = () => {
         console.log(error.message)
       });
     // alert(user.signInUserSession.idToken.jwtToken);
-    // console.log(user)
+    console.log(user)
   }
 
   return (
@@ -38,6 +40,8 @@ const New = () => {
       <input type="text" name="item" value={item} onChange={(e)=>setItem(e.target.value)}/>
       cost:
       <input type="number" name="cost" value={cost} onChange={(e)=>setCost(parseInt(e.target.value))}/>
+      income:
+      <input type="checkbox" name="income" value={income} onChange={()=>setIncome(!income)}/>
       <button onClick={(e)=> handleClick(e, user)}>
         save
       </button>
