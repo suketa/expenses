@@ -1,14 +1,20 @@
 import { useState, useContext } from 'react';
+import axios from 'axios';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
+import Checkbox from '@material-ui/core/Checkbox';
 import { UserContext } from '../context'
 import { expenses_api } from '../const'
-import axios from 'axios';
 
 // TODO: move another file
-const Button = ({enabled, onClick, ...props}) => {
+const ExpensesButton = ({enabled, onClick, ...props}) => {
   return (
-    <button onClick={onClick} disabled={!enabled}>
+    <Button color="primary" variant="contained" onClick={onClick} disabled={!enabled}>
       {props.children}
-    </button>
+    </Button>
   )
 }
 
@@ -16,7 +22,7 @@ const New = () => {
   const [ item, setItem ] = useState('');
   const [ cost, setCost ] = useState(0);
   const [ income, setIncome ] = useState(false);
-  const [ message, setMessage ] = useState('')
+  const [ message, setMessage ] = useState('Expenses')
   const [ savingEnabled, setSavingEnabled ] = useState(false);
 
   const user = useContext(UserContext);
@@ -77,20 +83,58 @@ const New = () => {
 
   return (
     <>
-      <p>{message}</p>
       <form>
-        item:
-        <input type="text" name="item" disabled={income} value={item} onChange={onChangeItem}/>
-        cost:
-        <input type="number" name="cost" value={cost} onChange={onChangeCost}/>
-        income:
-        <input type="checkbox" name="income" value={income} onChange={onChangeIncome}/>
-        <Button onClick={onClickSave} enabled={savingEnabled}>
-          save
-        </Button>
-      </form>
-    </>
-  )
+        <FormGroup>
+          <div>{message}</div>
+          <FormControl margin="normal">
+            <TextField 
+              required 
+              label="Item" 
+              variant="outlined" 
+              InputLabelProps={{
+                shrink: true,
+              }}
+              disabled={income} 
+              value={item} 
+              onChange={onChangeItem}
+            />
+          </FormControl>
+					<FormControl margin="normal">
+						<TextField 
+							required 
+							label="Cost" 
+							variant="outlined"
+							type="number" 
+							InputLabelProps={{
+								shrink: true,
+							}}
+							name="cost"
+							value={cost} 
+							onChange={onChangeCost}
+						/>
+					</FormControl>
+					<FormControl margin="normal">
+						<FormControlLabel
+							control={
+								<Checkbox
+									checked={income}
+									onChange={onChangeIncome}
+									name="income"
+									color="primary"
+								/>
+							}
+							label="income"
+						/>
+					</FormControl>
+					<FormControl margin="normal">
+						<ExpensesButton onClick={onClickSave} enabled={savingEnabled}>
+							save
+						</ExpensesButton>
+					</FormControl>
+				</FormGroup>
+			</form>
+		</>
+	)
 }
 
 export default New;
