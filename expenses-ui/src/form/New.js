@@ -5,8 +5,10 @@ import axios from 'axios';
 
 // TODO: move another file
 const Button = ({enabled, onClick, ...props}) => {
+  const opacity = enabled ? "" : "disabled:opacity-50"
+  const css = `${opacity} text-white bg-blue-500 hover:bg-blue-600 w-40 px-5`
   return (
-    <button className="text-white bg-blue-500 hover:bg-blue-600 w-40 px-5" onClick={onClick} disabled={!enabled}>
+    <button className={css} onClick={onClick} disabled={!enabled}>
       {props.children}
     </button>
   )
@@ -79,11 +81,11 @@ const New = () => {
     <>
       <p>{message}</p>
       <form className="grid">
-        <label className="text-left" for="item">Item *</label>
-        <input type="text" name="item" disabled={income} value={item} onChange={onChangeItem}/>
-        <label className="text-left" for="cost">Cost *</label>
-        <input type="number" name="cost" value={cost} onChange={onChangeCost}/>
-        <label className="text-left" for="income">
+        <label className="text-left" htmlFor="item">Item *</label>
+        <input type="text" className="text-black" name="item" disabled={income} value={item} onChange={onChangeItem}/>
+        <label className="text-left" htmlFor="cost">Cost *</label>
+        <input type="number" className="text-black" name="cost" value={cost} onChange={onChangeCost}/>
+        <label className="text-left" htmlFor="income">
           <input type="checkbox" id="income" value={income} onChange={onChangeIncome}/>income
         </label>
       </form>
