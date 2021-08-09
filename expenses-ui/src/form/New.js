@@ -6,7 +6,7 @@ import axios from 'axios';
 // TODO: move another file
 const Button = ({enabled, onClick, ...props}) => {
   return (
-    <button onClick={onClick} disabled={!enabled}>
+    <button className="text-white bg-blue-500 hover:bg-blue-600 w-40 px-5" onClick={onClick} disabled={!enabled}>
       {props.children}
     </button>
   )
@@ -78,17 +78,18 @@ const New = () => {
   return (
     <>
       <p>{message}</p>
-      <form>
-        item:
+      <form className="grid">
+        <label className="text-left" for="item">Item *</label>
         <input type="text" name="item" disabled={income} value={item} onChange={onChangeItem}/>
-        cost:
+        <label className="text-left" for="cost">Cost *</label>
         <input type="number" name="cost" value={cost} onChange={onChangeCost}/>
-        income:
-        <input type="checkbox" name="income" value={income} onChange={onChangeIncome}/>
-        <Button onClick={onClickSave} enabled={savingEnabled}>
-          save
-        </Button>
+        <label className="text-left" for="income">
+          <input type="checkbox" id="income" value={income} onChange={onChangeIncome}/>income
+        </label>
       </form>
+      <Button onClick={onClickSave} enabled={savingEnabled}>
+        save
+      </Button>
     </>
   )
 }

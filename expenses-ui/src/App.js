@@ -22,7 +22,9 @@ const App = () => {
           <UserContext.Provider value={user}>
             <New />
           </UserContext.Provider>
+          <div className="m-1">
           <AmplifySignOut />
+          </div>
         </header>
       </div>
   ) : ( <AmplifyAuthenticator /> );
