@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { UserContext } from './context'
 import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
 import New from './form/New';
+import MenuBar from './form/MenuBar';
 
 const App = () => {
   const [authState, setAuthState] = useState();
@@ -18,6 +19,7 @@ const App = () => {
 
   return authState === AuthState.SignedIn && user ? (
       <div className="App">
+        <MenuBar />
         <header className="App-header">
           <UserContext.Provider value={user}>
             <New />
