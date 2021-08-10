@@ -5,8 +5,13 @@ import { UserContext, SetAuthStateContext } from './context'
 import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
 import New from './form/New';
 import MenuBar from './form/MenuBar';
+import BottomBar from './form/BottomBar';
 
 const App = () => {
+  const onChangeBottomBar = (value) => {
+    console.log(value);
+  }
+
   const [authState, setAuthState] = useState();
   const [user, setUser] = useState();
 
@@ -27,6 +32,7 @@ const App = () => {
             <New />
           </UserContext.Provider>
         </header>
+        <BottomBar onChangeBottomBar={onChangeBottomBar} />
       </div>
   ) : ( <AmplifyAuthenticator /> );
 };
