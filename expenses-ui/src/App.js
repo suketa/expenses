@@ -1,7 +1,7 @@
 import './App.css';
-import { AmplifyAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import { AmplifyAuthenticator } from '@aws-amplify/ui-react';
 import { useState, useEffect } from 'react';
-import { UserContext } from './context'
+import { UserContext, SetAuthStateContext } from './context'
 import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
 import New from './form/New';
 import MenuBar from './form/MenuBar';
@@ -15,16 +15,17 @@ const App = () => {
       setAuthState(nextAuthState);
       setUser(authData);
     });
-  }, []);
+  }, [authState]);
 
   return authState === AuthState.SignedIn && user ? (
       <div className="App">
-        <MenuBar />
+        <SetAuthStateContext.Provider value={setAuthState}>
+          <MenuBar />
+        </SetAuthStateContext.Provider>
         <header className="App-header">
           <UserContext.Provider value={user}>
             <New />
           </UserContext.Provider>
-          <AmplifySignOut />
         </header>
       </div>
   ) : ( <AmplifyAuthenticator /> );
