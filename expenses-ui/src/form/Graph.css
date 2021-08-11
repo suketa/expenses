@@ -1,0 +1,9 @@
+.chart {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 5px;
+  width: 96%;
+  height: 380px;
+  background-color: #fff
+}
