@@ -6,27 +6,62 @@ class ExpensesGraphData
 
   def initialize(event, _context)
     @event = event
-    pp event['pathParameters'] 
-    pp _context
   end
 
   def run
-    response(200, "success")
+    data = query_data
+    response(200, 'success', data)
   rescue StandardError => e
     puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}"
-    response(400, "failed to insert record, #{e.message}")
+    response(400, "failed to query record. #{e.class} #{e.message}", '')
   end
 
   private
 
-  def response(code, message)
+  def query_data
+    year = @event.dig('pathParameters', 'year')
+    last_year = (year.to_i - 1).to_s
+    ydata = db_query(year)
+    ldata = db_query(last_year)
+    merge_data(ydata, ldata)
+  end
+
+  def db_query(year)
+    res = dynamodb.query(query_param(year))
+    res.items.to_h do |item|
+      [item['dkey'][-2..], item['cost'].to_i]
+    end
+  end
+
+  def query_param(year)
+    {
+      table_name: ENV['EXPENSES_TABLE'],
+      projection_expression: 'dkey, cost',
+      key_conditions: {
+        'uid' => {
+          attribute_value_list: [year],
+          comparison_operator: 'EQ'
+        }
+      }
+    }
+  end
+
+  def merge_data(ydata, ldata)
+    (1..12).to_a.map do |i|
+      month = format('%02d', i)
+      { month: month, cost: ydata[month] || 0, lcost: ldata[month] || 0 }
+    end
+  end
+
+  def response(code, message, data)
     {
       statusCode: code,
       headers: {
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": '*'
       },
       body: {
-        message: message
+        message: message,
+        data: data
       }.to_json
     }
   end
@@ -37,15 +72,14 @@ class ExpensesGraphData
 end
 
 #
-# Expected JSON Body
+# Expected Parameter
 #
-# {
-#   key: "book",
-#   cost: 2000,
-#   income: false
-# }
+#   /graphdata/{year}
+#
+# example
+#   /graphdata/2021
 #
 def lambda_handler(event:, context:)
-  getter = ExpensesGraphData.new(event, context)
-  getter.run
+  graphdata = ExpensesGraphData.new(event, context)
+  graphdata.run
 end
