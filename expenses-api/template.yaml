@@ -95,6 +95,36 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+  GraphDataExpensesFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: api/
+      Handler: graphdata.lambda_handler
+      Runtime: ruby2.7
+      MemorySize: 128
+      Timeout: 100
+      Description: expenses item gets
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExpensesTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          EXPENSES_TABLE: !Ref ExpensesTable
+      Events:
+        Post:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /expenses/graphdata/{year}/
+            RestApiId: !Ref ExpensesApi
+            Method: GET
+            RequestParameters:
+              "method.request.path.year" : "integration.request.path.year"
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ExpensesTable:
     Type: AWS::DynamoDB::Table
