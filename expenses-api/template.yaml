@@ -99,7 +99,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: api/
-      Handler: graphdata.lambda_handler
+      Handler: graph_data.lambda_handler
       Runtime: ruby2.7
       MemorySize: 128
       Timeout: 100
@@ -116,7 +116,7 @@ Resources:
         Post:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /expenses/graphdata/{year}/
+            Path: /expenses/graph_data/{year}/
             RestApiId: !Ref ExpensesApi
             Method: GET
             RequestParameters:

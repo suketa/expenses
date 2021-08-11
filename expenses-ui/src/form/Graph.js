@@ -1,8 +1,14 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import './Graph.css';
 import { LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, ResponsiveContainer} from 'recharts'
 
 const Graph = () => {
+  [data, setData] = useState([])
+
+  useEffect(() => {
+
+  }, [])
+
   const data = [
     { month: "01", cost: 260195 },
     { month: "02", cost: 529689 },
