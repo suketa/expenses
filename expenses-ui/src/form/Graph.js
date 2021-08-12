@@ -26,6 +26,13 @@ const Graph = () => {
     return () => {isMounted = false}
   });
 
+  const toolTipFormatter = (value, name, props) => {
+    name = name === 'cost' ? 'this year' : 'last year'
+    return ([value, name])
+  }
+
+  /*
+          */
   return (
     <div className="chart">
       <ResponsiveContainer>
@@ -34,8 +41,8 @@ const Graph = () => {
           <XAxis dataKey="month" padding={{left: 5}}/>
           <YAxis tickFormatter={(item) => {return item/1000}} />
           <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Line type="line" dataKey="cost" stroke="#1e90ff" />
+          <Tooltip formatter={toolTipFormatter}/>
+          <Line type="line" dataKey="cost"  stroke="#1e90ff" />
           <Line type="line" dataKey="lcost" stroke="#3cb371" />
         </LineChart>
       </ResponsiveContainer>
