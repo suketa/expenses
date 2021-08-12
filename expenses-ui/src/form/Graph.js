@@ -1,28 +1,31 @@
-import React, {useState, useEffect} from 'react';
-import './Graph.css';
+import React, {useState, useEffect, useContext} from 'react';
+import axios from 'axios';
 import { LineChart, XAxis, YAxis, Line, Tooltip, CartesianGrid, ResponsiveContainer} from 'recharts'
+import './Graph.css';
+import { expenses_api } from '../const'
+import { UserContext } from '../context'
 
 const Graph = () => {
-  [data, setData] = useState([])
+  const [data, setData] = useState([])
+  const user = useContext(UserContext);
+
+  const config = {
+    headers: { Authorization: user.signInUserSession.idToken.jwtToken }
+  };
+  const year = (new Date()).getFullYear();
+  const url = `${expenses_api.graph_data}${year}`
 
   useEffect(() => {
+    let isMounted = true;
+    axios.get(url, config)
+      .then(response => {
+        if (isMounted) {
+          setData(response.data.data);
+        }
+      });
+    return () => {isMounted = false}
+  });
 
-  }, [])
-
-  const data = [
-    { month: "01", cost: 260195 },
-    { month: "02", cost: 529689 },
-    { month: "03", cost: 243304 },
-    { month: "04", cost: 155510 },
-    { month: "05", cost: 123450 },
-    { month: "06", cost: 223460 },
-    { month: "07", cost: 378100 },
-    { month: "08", cost: 224930 },
-    { month: "09", cost: 338430 },
-    { month: "10", cost: 234320 },
-    { month: "11", cost: 323310 },
-    { month: "12", cost: 0 },
-  ];
   return (
     <div className="chart">
       <ResponsiveContainer>
@@ -32,7 +35,8 @@ const Graph = () => {
           <YAxis tickFormatter={(item) => {return item/1000}} />
           <CartesianGrid strokeDasharray="3 3" />
           <Tooltip />
-          <Line type="monotone" dataKey="cost" stroke="#00887A" />
+          <Line type="line" dataKey="cost" stroke="#1e90ff" />
+          <Line type="line" dataKey="lcost" stroke="#3cb371" />
         </LineChart>
       </ResponsiveContainer>
     </div>
