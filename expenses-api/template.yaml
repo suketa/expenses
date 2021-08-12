@@ -68,6 +68,30 @@ Resources:
             BatchSize: 100
             StartingPosition: TRIM_HORIZON
 
+  ExpensesMonthlyEvent:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cron/
+      Handler: monthly_entry.handler
+      Runtime: ruby2.7
+      Policies:
+        - AWSLambdaDynamoDBExecutionRole
+        # Give Create/Read/Update/Delete Permissions to the SampleTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ExpensesTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          EXPENSES_TABLE: !Ref ExpensesTable
+      Events:
+        MonthlyEvent:
+          Type: Schedule
+          Properties:
+            Schedule: "cron(0 1 1 * ? *)"
+            # Schedule: "cron(0,5,10,15,20,25,30,35,40,45,50,55 * * * ? *)"
+            Enabled: true
+            Name: ExpensesMonthlyEvent
+
   CreateExpensesFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
