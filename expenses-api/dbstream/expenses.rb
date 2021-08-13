@@ -17,6 +17,8 @@ class ExpensesTrigger
 
       update_total_cost(key, cost) if cost != 0
     end
+  rescue StandardError => e
+    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}, #{e.backtrace}"
   end
 
   def sub_summary(records)

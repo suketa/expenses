@@ -16,7 +16,7 @@ class ExpensesCreator
     dynamodb.update_item(param)
     response(200, 'success')
   rescue StandardError => e
-    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}"
+    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}, #{e.backtrace}"
     response(400, "failed to insert record, #{e.message}")
   end
 
