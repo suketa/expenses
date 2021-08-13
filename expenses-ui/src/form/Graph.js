@@ -9,30 +9,30 @@ const Graph = () => {
   const [data, setData] = useState([])
   const user = useContext(UserContext);
 
-  const config = {
-    headers: { Authorization: user.signInUserSession.idToken.jwtToken }
-  };
   const year = (new Date()).getFullYear();
   const url = `${expenses_api.graph_data}${year}`
 
   useEffect(() => {
     let isMounted = true;
+    const config = {
+      headers: { Authorization: user.signInUserSession.idToken.jwtToken }
+    };
+
     axios.get(url, config)
       .then(response => {
         if (isMounted) {
           setData(response.data.data);
         }
       });
+
     return () => {isMounted = false}
-  });
+  }, [url, user.signInUserSession.idToken.jwtToken]);
 
   const toolTipFormatter = (value, name, props) => {
     name = name === 'cost' ? 'this year' : 'last year'
     return ([value, name])
   }
 
-  /*
-          */
   return (
     <div className="chart">
       <ResponsiveContainer>
