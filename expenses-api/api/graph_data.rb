@@ -12,7 +12,7 @@ class ExpensesGraphData
     data = query_data
     response(200, 'success', data)
   rescue StandardError => e
-    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}"
+    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}, #{e.backtrace}"
     response(400, "failed to query record. #{e.class} #{e.message}", '')
   end
 
