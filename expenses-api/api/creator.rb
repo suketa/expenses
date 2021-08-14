@@ -1,9 +1,9 @@
 require 'json'
-require 'aws-sdk-dynamodb'
 require 'expenses_api_base'
+require 'dynamodb_accessor'
 
 class ExpensesCreator < ExpensesApiBase
-  VERSION = '0.0.1'.freeze
+  include 'DynamoDBAccessor'
 
   private
 
@@ -53,10 +53,6 @@ class ExpensesCreator < ExpensesApiBase
       },
       update_expression: 'SET cost = if_not_exists(cost, :initial_cost) + :cost'
     }
-  end
-
-  def dynamodb
-    @dynamodb ||= Aws::DynamoDB::Client.new
   end
 end
 

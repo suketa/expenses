@@ -1,9 +1,9 @@
 require 'json'
-require 'aws-sdk-dynamodb'
 require 'expenses_api_base'
+require 'dynamodb_accessor'
 
 class ExpensesGraphData < ExpensesApiBase
-  VERSION = '0.0.1'.freeze
+  include DynamoDBAccessor
 
   private
 
@@ -49,10 +49,6 @@ class ExpensesGraphData < ExpensesApiBase
       month = format('%02d', i)
       { month: month, cost: ydata[month] || 0, lcost: ldata[month] || 0 }
     end
-  end
-
-  def dynamodb
-    @dynamodb ||= Aws::DynamoDB::Client.new
   end
 end
 
