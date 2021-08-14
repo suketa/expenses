@@ -147,7 +147,19 @@ Resources:
               "method.request.path.year" : "integration.request.path.year"
             Auth:
               Authorizer: CognitoAuthorizer
+      Layers:
+        - !Ref ExpensesLibs
 
+  ExpensesLibs:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: expenses-lib
+      ContentUri: lib/.
+      RetentionPolicy: Delete
+      CompatibleRuntimes:
+        - ruby2.7
+    Metadata:
+      BuildMethod: ruby2.7
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ExpensesTable:

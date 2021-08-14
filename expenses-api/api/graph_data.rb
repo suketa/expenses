@@ -1,5 +1,6 @@
 require 'json'
 require 'aws-sdk-dynamodb'
+require 'lib/expenses_base'
 
 class ExpensesGraphData
   VERSION = '0.0.1'.freeze
@@ -80,6 +81,8 @@ end
 #   /graphdata/2021
 #
 def lambda_handler(event:, context:)
-  graphdata = ExpensesGraphData.new(event, context)
-  graphdata.run
+  expenses_base = ExpensesBase.new
+  expenses_base.test
+  # graphdata = ExpensesGraphData.new(event, context)
+  # graphdata.run
 end
