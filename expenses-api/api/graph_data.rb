@@ -1,23 +1,20 @@
 require 'json'
 require 'aws-sdk-dynamodb'
-require 'lib/expenses_base'
+require 'expenses_api_base'
 
-class ExpensesGraphData
+class ExpensesGraphData < ExpensesApiBase
   VERSION = '0.0.1'.freeze
 
-  def initialize(event, _context)
-    @event = event
-  end
+  private
 
-  def run
+  def pure_run
     data = query_data
     response(200, 'success', data)
-  rescue StandardError => e
-    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}, #{e.backtrace}"
-    response(400, "failed to query record. #{e.class} #{e.message}", '')
   end
 
-  private
+  def response_error_message
+    'failed to query data'
+  end
 
   def query_data
     year = @event.dig('pathParameters', 'year')
@@ -54,19 +51,6 @@ class ExpensesGraphData
     end
   end
 
-  def response(code, message, data)
-    {
-      statusCode: code,
-      headers: {
-        "Access-Control-Allow-Origin": '*'
-      },
-      body: {
-        message: message,
-        data: data
-      }.to_json
-    }
-  end
-
   def dynamodb
     @dynamodb ||= Aws::DynamoDB::Client.new
   end
@@ -81,8 +65,6 @@ end
 #   /graphdata/2021
 #
 def lambda_handler(event:, context:)
-  expenses_base = ExpensesBase.new
-  expenses_base.test
-  # graphdata = ExpensesGraphData.new(event, context)
-  # graphdata.run
+  graphdata = ExpensesGraphData.new(event, context)
+  graphdata.run
 end
