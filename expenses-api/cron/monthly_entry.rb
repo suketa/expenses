@@ -1,7 +1,9 @@
 require 'json'
-require 'aws-sdk-dynamodb'
+require 'dynamodb_accessor'
 
 class ExpensesMonthlyEntry
+  include DynamoDBAccessor
+
   VERSION = '0.0.1'.freeze
 
   def initialize(event, _context)
@@ -79,10 +81,6 @@ class ExpensesMonthlyEntry
         data: data
       }.to_json
     }
-  end
-
-  def dynamodb
-    @dynamodb ||= Aws::DynamoDB::Client.new
   end
 end
 

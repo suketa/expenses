@@ -1,7 +1,9 @@
 require 'json'
-require 'aws-sdk-dynamodb'
+require 'dynamodb_accessor'
 
 class ExpensesTrigger
+  include DynamoDBAccessor
+
   VERSION = '0.0.1'.freeze
 
   def initialize(dynamodb: nil)
@@ -103,10 +105,6 @@ class ExpensesTrigger
       },
       update_expression: 'SET cost = if_not_exists(cost, :initial_cost) + :total_cost'
     }
-  end
-
-  def dynamodb
-    @dynamodb ||= Aws::DynamoDB::Client.new
   end
 
   def dkey(record)
