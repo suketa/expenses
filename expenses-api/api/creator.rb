@@ -3,7 +3,7 @@ require 'expenses_api_base'
 require 'dynamodb_accessor'
 
 class ExpensesCreator < ExpensesApiBase
-  include 'DynamoDBAccessor'
+  include DynamoDBAccessor
 
   private
 
