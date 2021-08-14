@@ -1,26 +1,24 @@
 require 'json'
 require 'aws-sdk-dynamodb'
+require 'expenses_api_base'
 
-class ExpensesCreator
+class ExpensesCreator < ExpensesApiBase
   VERSION = '0.0.1'.freeze
 
-  def initialize(event, _context)
-    @event = event
-  end
+  private
 
-  def run
+  def pure_run
     record = record(@event)
     dkey = dkey(record)
     uid = uid(dkey)
     param = update_item_param(uid, dkey, record['cost'])
     dynamodb.update_item(param)
     response(200, 'success')
-  rescue StandardError => e
-    puts "Error: #{e.class}, #{e.message}, event=#{@event.inspect}, #{e.backtrace}"
-    response(400, "failed to insert record, #{e.message}")
   end
 
-  private
+  def response_error_message
+    'failed to insert'
+  end
 
   def record(event)
     JSON.parse(event['body'])
@@ -54,18 +52,6 @@ class ExpensesCreator
         ':initial_cost' => 0
       },
       update_expression: 'SET cost = if_not_exists(cost, :initial_cost) + :cost'
-    }
-  end
-
-  def response(code, message)
-    {
-      statusCode: code,
-      headers: {
-        "Access-Control-Allow-Origin": "*"
-      },
-      body: {
-        message: message
-      }.to_json
     }
   end
 

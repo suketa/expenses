@@ -67,6 +67,8 @@ Resources:
             Stream: !GetAtt ExpensesTable.StreamArn
             BatchSize: 100
             StartingPosition: TRIM_HORIZON
+      Layers:
+        - !Ref ExpensesLibs
 
   ExpensesMonthlyEvent:
     Type: AWS::Serverless::Function
@@ -118,6 +120,8 @@ Resources:
             Method: post
             Auth:
               Authorizer: CognitoAuthorizer
+      Layers:
+        - !Ref ExpensesLibs
 
   GraphDataExpensesFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
