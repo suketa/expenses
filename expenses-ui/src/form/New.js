@@ -54,6 +54,14 @@ const New = () => {
     setSaveButtonEnabled(item, cost, value);
   }
 
+  const onKeyPressForm = (event) => {
+    // event.preventDefault()
+    if (event.key === 'Enter' && savingEnabled) {
+      console.log(event.key === 'Enter')
+      event.preventDefault();
+    }
+  }
+
   const onClickSave = (event) => {
     setSavingEnabled(false)
     setMessage('Saving...')
@@ -84,7 +92,7 @@ const New = () => {
   return (
     <>
       <form>
-        <FormGroup>
+        <FormGroup onKeyPress={onKeyPressForm}>
           <div>{message}</div>
           <FormControl margin="normal">
             <TextField 
