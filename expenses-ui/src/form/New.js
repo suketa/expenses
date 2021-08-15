@@ -54,10 +54,9 @@ const New = () => {
     setSaveButtonEnabled(item, cost, value);
   }
 
-  const onClickSave = (event) => {
+  const saveData = () => {
     setSavingEnabled(false)
     setMessage('Saving...')
-    event.preventDefault();
 
     const config = {
       headers: { Authorization: user.signInUserSession.idToken.jwtToken }
@@ -81,10 +80,23 @@ const New = () => {
       });
   }
 
+  const onKeyPressForm = (event) => {
+    // event.preventDefault()
+    if (event.key === 'Enter' && savingEnabled) {
+      event.preventDefault();
+      saveData()
+    }
+  }
+
+  const onClickSave = (event) => {
+    event.preventDefault();
+    saveData()
+  }
+
   return (
     <>
       <form>
-        <FormGroup>
+        <FormGroup onKeyPress={onKeyPressForm}>
           <div>{message}</div>
           <FormControl margin="normal">
             <TextField 
