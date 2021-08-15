@@ -54,18 +54,9 @@ const New = () => {
     setSaveButtonEnabled(item, cost, value);
   }
 
-  const onKeyPressForm = (event) => {
-    // event.preventDefault()
-    if (event.key === 'Enter' && savingEnabled) {
-      console.log(event.key === 'Enter')
-      event.preventDefault();
-    }
-  }
-
-  const onClickSave = (event) => {
+  const saveData = () => {
     setSavingEnabled(false)
     setMessage('Saving...')
-    event.preventDefault();
 
     const config = {
       headers: { Authorization: user.signInUserSession.idToken.jwtToken }
@@ -87,6 +78,19 @@ const New = () => {
         setMessage(error)
         setSavingEnabled(true);
       });
+  }
+
+  const onKeyPressForm = (event) => {
+    // event.preventDefault()
+    if (event.key === 'Enter' && savingEnabled) {
+      event.preventDefault();
+      saveData()
+    }
+  }
+
+  const onClickSave = (event) => {
+    event.preventDefault();
+    saveData()
   }
 
   return (
