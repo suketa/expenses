@@ -29,6 +29,7 @@ const New = () => {
   const [income, setIncome] = useState(false);
   const [message, setMessage] = useState("Expenses");
   const [savingEnabled, setSavingEnabled] = useState(false);
+  const [disabledEntry, setDisabledEntry] = useState(false);
 
   const user = useContext(UserContext);
 
@@ -61,6 +62,7 @@ const New = () => {
 
   const saveData = () => {
     setSavingEnabled(false);
+    setDisabledEntry(true);
     setMessage("Saving...");
 
     const config = {
@@ -79,10 +81,12 @@ const New = () => {
       .then((response) => {
         setMessage(response.data.message);
         setSavingEnabled(true);
+        setDisabledEntry(false);
       })
       .catch((error) => {
         setMessage(error);
         setSavingEnabled(true);
+        setDisabledEntry(false);
       });
   };
 
@@ -111,7 +115,7 @@ const New = () => {
             InputLabelProps={{
               shrink: true,
             }}
-            disabled={income}
+            disabled={income || disabledEntry}
             value={item}
             onChange={onChangeItem}
           />
@@ -128,6 +132,7 @@ const New = () => {
             name="cost"
             value={cost}
             onChange={onChangeCost}
+            disabled={disabledEntry}
           />
         </FormControl>
         <FormControl margin="normal">
@@ -136,6 +141,7 @@ const New = () => {
               <Checkbox
                 checked={income}
                 onChange={onChangeIncome}
+                disabled={disabledEntry}
                 name="income"
                 color="primary"
               />

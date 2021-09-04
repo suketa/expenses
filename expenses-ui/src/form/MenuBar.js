@@ -29,7 +29,7 @@ export default function MenuBar() {
     <div>
       <AppBar position="static">
         <Toolbar className={classes.toolbar}>
-          v0.1.0
+          v0.2.0
           <Button color="inherit" onClick={() =>onClickSignOut(setAuthState)}>SIGN OUT</Button>
         </Toolbar>
       </AppBar>
