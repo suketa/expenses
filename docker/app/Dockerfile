@@ -45,14 +45,14 @@ RUN cd /tmp && \
     cd .. && rm -rf ruby-2.7.2
 
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
-    apt-get install -y --no-install-recommends nodejs && apt-get clean && rm -r /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends nodejs && apt-get clean &&  npm install -g npm && rm -r /var/lib/apt/lists/*
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.21.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.46.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip && rm -rf ./aws
 
-RUN pip install aws-sam-cli==1.27.1
-RUN npm install -g @aws-amplify/cli@5.2.1
+RUN pip install aws-sam-cli==1.33.0
+RUN npm install -g @aws-amplify/cli@6.3.1
 
 WORKDIR /app
