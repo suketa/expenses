@@ -280,3 +280,5 @@ amplifytools.xcconfig
 team-provider-info.json
 const.js
 #amplify-do-not-edit-end
+
+dotfiles/
